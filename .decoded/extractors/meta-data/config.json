@@ -1,0 +1,6 @@
+{
+  "name": "cv-defect-detection-ResNet-128",
+  "author": "// e.g. josh@decoded.ai",
+  "src": "./example",
+  "cmd": "python3 -m example"
+}
