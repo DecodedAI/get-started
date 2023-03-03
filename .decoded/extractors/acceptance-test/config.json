@@ -1,0 +1,280 @@
+{
+    "source": ": ./example'",
+    "title": "Acceptance Tests",
+    "status": "#fe4262",
+    "collections": [
+        {
+            "run_id": 5476498503024458000,
+            "file": "./example/__main__.py",
+            "tests": [
+                {
+                    "name": "test_delayed_cannibalization",
+                    "code": "def test_delayed_cannibalization():\n    promotions = [{'product_id': 1, 'discount_rate': 0.2}, {'product_id': 2, 'discount_rate': 0.1}]\n    delayed_cannibalization = {'product_id': 1, 'delay': 3}\n    result = apply_promotions(promotions, delayed_cannibalization)\n    assert result == {'product_id': 1, 'delay': 0}",
+                    "tags": [
+                        {
+                            "category": "Environment Step Logic",
+                            "details": [
+                                {
+                                    "name": "Validity of Economic Behaviour: Delayed Cannibalization",
+                                    "description": "If delayed cannibalization of goods is not respected then the knock-on effects of promotions may not be preserverd"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "test_class_imbalance",
+                    "code": "def test_class_imbalance():\n    observation_data = {'positive_class': [1, 1, 1, 1], 'negative_class': [0, 0, 0]}\n    assert len(observation_data['positive_class']) != len(observation_data['negative_class'])",
+                    "tags": [
+                        {
+                            "category": "Model Risk: Bias",
+                            "details": [
+                                {
+                                    "name": "Class Imbalance",
+                                    "description": "If the observation data presents imbalanced class data then the model will have been trained on biased data"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "test_positive_proportion_labels",
+                    "code": "def test_positive_proportion_labels():\n    observation_data = {'positive_class': [1, 1, 1], 'negative_class': [0, 0, 0]}\n    model = train_model(observation_data, positive_proportion=0.9)\n    assert model.predict([0, 0, 0, 1, 1, 1]).tolist().count(1) > 3",
+                    "tags": [
+                        {
+                            "category": "Model Risk: Bias",
+                            "details": [
+                                {
+                                    "name": "Difference in Positive Proportion Labels",
+                                    "description": "If the model amplifies bias in the observation data then we will be in contradiction to our ethical goals"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "test_pack_size_cannibalization",
+                    "code": "def test_pack_size_cannibalization():\n    pack_sizes = [{'product_id': 1, 'pack_size': 10}, {'product_id': 2, 'pack_size': 5}]\n    cannibalization = {'product_id': 1, 'quantity': 5}\n    result = apply_cannibalization(cannibalization, pack_sizes)\n    assert result == {'product_id': 1, 'quantity': 5}",
+                    "tags": [
+                        {
+                            "category": "Environment Step Logic",
+                            "details": [
+                                {
+                                    "name": "Validity of Economic Behaviour: Pack Size Cannibalization",
+                                    "description": "If cannibalization of goods across pack-sizes is not respected then the total reward will be overestimated"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "test_cross_category_cannibalization",
+                    "code": "def test_cross_category_cannibalization():\n    categories = [{'product_id': 1, 'category': 'A'}, {'product_id': 2, 'category': 'B'}]\n    cannibalization = {'product_id': 1, 'quantity': 2}\n    result = apply_cannibalization(cannibalization, categories)\n    assert result == {'product_id': 1, 'quantity': 2}",
+                    "tags": [
+                        {
+                            "category": "Environment Step Logic",
+                            "details": [
+                                {
+                                    "name": "Validity of Economic Behaviour: Cross-Category Cannibalization",
+                                    "description": "If cannibalization of goods across categories is not respected then the total reward will be overestimated"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "test_conditional_demographic_disparity",
+                    "code": "def test_conditional_demographic_disparity():\n    observation_data = {'Segment A': {'Male': [1, 2, 3], 'Female': [-1, -2, -3]}, 'Segment B': {'Male': [-1, -1, -1], 'Female': [-2, -2, -2]}}\n    avg_neg_reward_segment_a_male = sum(observation_data['Segment A']['Male']) / len(observation_data['Segment A']['Male'])\n    avg_neg_reward_segment_a_female = sum(observation_data['Segment A']['Female']) / len(observation_data['Segment A']['Female'])\n    avg_neg_reward_segment_b_male = sum(observation_data['Segment B']['Male']) / len(observation_data['Segment B']['Male'])\n    avg_neg_reward_segment_b_female = sum(observation_data['Segment B']['Female']) / len(observation_data['Segment B']['Female'])\n    assert avg_neg_reward_segment_a_male != avg_neg_reward_segment_a_female\n    assert avg_neg_reward_segment_b_male != avg_neg_reward_segment_b_female",
+                    "tags": [
+                        {
+                            "category": "Model Risk: Bias",
+                            "details": [
+                                {
+                                    "name": "Conditional Demographic Disparity",
+                                    "description": "The model observation data might produce more negative rewards for some demographics than others, therefore amplifying bias in the model"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "test_adversarial_perturbation",
+                    "code": "def test_adversarial_perturbation():\n    query = {'text': 'I want to buy some apples'}\n    model_response = {'prediction': 'fruits'}\n    adversarial_perturbation = {'text': 'I want to buy some pineapples'}\n    assert model_response != adversarial_perturbation",
+                    "tags": [
+                        {
+                            "category": "Security",
+                            "details": [
+                                {
+                                    "name": "#1 Adversarial Perturbation",
+                                    "description": "In perturbation-style attacks, the attacker stealthily modifies the query to get a desired response from a production-deployed model. This is a breach of model input integrity which leads to fuzzing-style attacks where the end result isn’t necessarily an access violation or EOP, but instead compromises the model’s classification performance."
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "test_price_elasticity",
+                    "code": "def test_price_elasticity():\n    observation_data = {'Product A': {'Price': [10, 20, 30], 'Quantity': [100, 50, 25]}, 'Product B': {'Price': [5, 10, 15], 'Quantity': [200, 150, 100]}}\n    elasticity_product_a = sum(observation_data['Product A']['Quantity']) / len(observation_data['Product A']['Quantity']) / (sum(observation_data['Product A']['Price']) / len(observation_data['Product A']['Price']))\n    elasticity_product_b = sum(observation_data['Product B']['Quantity']) / len(observation_data['Product B']['Quantity']) / (sum(observation_data['Product B']['Price']) / len(observation_data['Product B']['Price']))\n    assert elasticity_product_a > 0 and elasticity_product_a < 1\n    assert elasticity_product_b > 0 and elasticity_product_b < 1",
+                    "tags": [
+                        {
+                            "category": "Environment Step Logic",
+                            "details": [
+                                {
+                                    "name": "Validity of Economic Behaviour: Price Elasticity",
+                                    "description": "If price elasticity is not respected then demand for some goods during promotion will not be valid"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "test_seasonality",
+                    "code": "def test_seasonality():\n    observation_data = {'Q1': [100, 200, 300], 'Q2': [50, 100, 150], 'Q3': [200, 300, 400], 'Q4': [250, 350, 450]}\n    total_sales_q1 = sum(observation_data['Q1'])\n    total_sales_q2 = sum(observation_data['Q2'])\n    total_sales_q3 = sum(observation_data['Q3'])\n    total_sales_q4 = sum(observation_data['Q4'])\n    assert total_sales_q1 < total_sales_q2\n    assert total_sales_q2 < total_sales_q3\n    assert total_sales_q3 < total_sales_q4",
+                    "tags": [
+                        {
+                            "category": "Environment Step Logic",
+                            "details": [
+                                {
+                                    "name": "Validity of Economic Behaviour: Seasonality",
+                                    "description": "If seasonality is not respected then some goods will be incorrectly modelled"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "test_sub_category_cannibalization",
+                    "code": "def test_sub_category_cannibalization():\n    observation_data = {'Category A': [100, 200, 300], 'Category B': [50, 100, 150], 'Category A, Subcategory X': [200, 300, 400]}\n    total_sales_category_a = sum(observation_data['Category A'])\n    total_sales_category_b = sum(observation_data['Category B'])\n    total_sales_subcategory_x = sum(observation_data['Category A, Subcategory X'])\n    assert total_sales_category_a - total_sales_subcategory_x >= total_sales_category_b",
+                    "tags": [
+                        {
+                            "category": "Environment Step Logic",
+                            "details": [
+                                {
+                                    "name": "Validity of Economic Behaviour: Sub-Category Cannibalization",
+                                    "description": "If cannibalization of goods across sub-categories is not respected then the total reward will be overestimated"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "test_cross_retailer_cannibalization",
+                    "code": "def test_cross_retailer_cannibalization():\n    observation_data = {'Retailer A': [100, 200, 300], 'Retailer B': [50, 100, 150], 'Retailer C': [200, 300, 400]}\n    total_sales_retailer_a = sum(observation_data['Retailer A'])\n    total_sales_retailer_b = sum(observation_data['Retailer B'])\n    total_sales_retailer_c = sum(observation_data['Retailer C'])\n    assert total_sales_retailer_a - (total_sales_retailer_b + total_sales_retailer_c) >= total_sales_retailer_b",
+                    "tags": [
+                        {
+                            "category": "Environment Step Logic",
+                            "details": [
+                                {
+                                    "name": "Validity of Economic Behaviour: Cross Retailer Cannibalization",
+                                    "description": "If cannibalization of goods across retailers is not respected then the total reward will be overestimated"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "test_targeted_data_poisoning",
+                    "code": "def test_targeted_data_poisoning():\n    observation_data = {'Segment A': [[1, 2, 3], [2, 3, 4], [3, 4, 5]], 'Segment B': [[-1, -2, -3], [-2, -3, -4], [-3, -4, -5]], 'Segment C': [[0, 0, 0], [1, 1, 1], [2, 2, 2]]}\n    training_data = []\n    for segment in observation_data:\n        for obs in observation_data[segment]:\n            label = 'negative' if obs[0] < 0 else 'positive'\n            training_data.append((obs, label))\n    model = train_model(training_data)\n    poisoned_data = [([-10, -20, -30], 'positive'), ([10, 20, 30], 'negative')]\n    training_data += poisoned_data\n    poisoned_model = train_model(training_data)\n    assert model != poisoned_model\n    testing_data = [[0, 1, 2], [-1, 0, 1], [2, 3, 4]]\n    original_predictions = [model.predict(obs) for obs in testing_data]\n    poisoned_predictions = [poisoned_model.predict(obs) for obs in testing_data]\n    assert original_predictions != poisoned_predictions",
+                    "tags": [
+                        {
+                            "category": "Security",
+                            "details": [
+                                {
+                                    "name": "#2a Targeted Data Poisoning",
+                                    "description": "The goal of the attacker is to contaminate the machine model generated in the training phase, so that predictions on new data will be modified in the testing phase[1]. In targeted poisoning attacks, the attacker wants to misclassify specific examples to cause specific actions to be taken or omitted."
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "headers": [
+        "Group",
+        "Sub-Group",
+        "Comment"
+    ],
+    "rows": [
+        [
+            "Environment Step Logic",
+            "Validity of Economic Behaviour: Delayed Cannibalization",
+            "If delayed cannibalization of goods is not respected then the knock-on effects of promotions may not be preserverd"
+        ],
+        [
+            "Model Risk: Bias",
+            "Class Imbalance",
+            "If the observation data presents imbalanced class data then the model will have been trained on biased data"
+        ],
+        [
+            "Model Risk: Bias",
+            "Difference in Positive Proportion Labels",
+            "If the model amplifies bias in the observation data then we will be in contradiction to our ethical goals"
+        ],
+        [
+            "Environment Step Logic",
+            "Validity of Economic Behaviour: Pack Size Cannibalization",
+            "If cannibalization of goods across pack-sizes is not respected then the total reward will be overestimated"
+        ],
+        [
+            "Environment Step Logic",
+            "Validity of Economic Behaviour: Cross-Category Cannibalization",
+            "If cannibalization of goods across categories is not respected then the total reward will be overestimated"
+        ],
+        [
+            "Model Risk: Bias",
+            "Conditional Demographic Disparity",
+            "The model observation data might produce more negative rewards for some demographics than others, therefore amplifying bias in the model"
+        ],
+        [
+            "Security",
+            "#1 Adversarial Perturbation",
+            "In perturbation-style attacks, the attacker stealthily modifies the query to get a desired response from a production-deployed model. This is a breach of model input integrity which leads to fuzzing-style attacks where the end result isn’t necessarily an access violation or EOP, but instead compromises the model’s classification performance."
+        ],
+        [
+            "Environment Step Logic",
+            "Validity of Economic Behaviour: Price Elasticity",
+            "If price elasticity is not respected then demand for some goods during promotion will not be valid"
+        ],
+        [
+            "Environment Step Logic",
+            "Validity of Economic Behaviour: Seasonality",
+            "If seasonality is not respected then some goods will be incorrectly modelled"
+        ],
+        [
+            "Environment Step Logic",
+            "Validity of Economic Behaviour: Sub-Category Cannibalization",
+            "If cannibalization of goods across sub-categories is not respected then the total reward will be overestimated"
+        ],
+        [
+            "Environment Step Logic",
+            "Validity of Economic Behaviour: Cross Retailer Cannibalization",
+            "If cannibalization of goods across retailers is not respected then the total reward will be overestimated"
+        ],
+        [
+            "Security",
+            "#2a Targeted Data Poisoning",
+            "The goal of the attacker is to contaminate the machine model generated in the training phase, so that predictions on new data will be modified in the testing phase[1]. In targeted poisoning attacks, the attacker wants to misclassify specific examples to cause specific actions to be taken or omitted."
+        ],
+        [
+            "Environment Step Logic",
+            "Validity of Economic Behaviour: Complementary Cross-Sell",
+            "If demand for complementary goods is not adjusted during or after a promotion then the reward will be underestimated"
+        ],
+        [
+            "Environment Step Logic",
+            "Validity of Economic Behaviour: Pull Forward",
+            "If the pull-forward effect is not respected then demand for some goods after promotion will not be valid"
+        ],
+        [
+            "Security",
+            "#2b Indiscriminate Data Poisoning",
+            "Goal is to ruin the quality/integrity of the data set being attacked. Many datasets are public/untrusted/uncurated, so this creates additional concerns around the ability to spot such data integrity violations in the first place. Training on unknowingly compromised data is a garbage-in/garbage-out situation. Once detected, triage needs to determine the extent of data that has been breached and quarantine/retrain"
+        ],
+        [
+            "Environment Step Logic",
+            "Robustness to Bad Data",
+            "The historical source data used to generate the training observations might be missing or corrupted, so the training environment should tolerate such risks."
+        ]
+    ]
+}
